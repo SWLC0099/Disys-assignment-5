@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package auction;
+
+option go_package = "github.com/SWLC0099/DISYS-ASSIGNMENT-5/gRPC;auctionpb";
+
+service Auction {
+  // client-facing
+  rpc Bid (BidRequest) returns (BidResponse) {}
+  rpc Result (ResultRequest) returns (ResultResponse) {}
+
+  // server-to-server internal RPCs
+  rpc Replicate (ReplicateRequest) returns (ReplicateResponse) {}
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse) {}
+  rpc GetState (GetStateRequest) returns (GetStateResponse) {}
+}
+
+message BidRequest {
+  int64 amount = 1;
+}
+
+message BidResponse {
+  enum Outcome { SUCCESS = 0; FAIL = 1; EXCEPTION = 2; }
+  Outcome outcome = 1;
+  string message = 2;
+}
+
+message ResultRequest {}
+
+message ResultResponse {
+  bool closed = 1;
+  // highest bid is 0 if none
+  int64 highest_bid = 2;
+  string winner = 3; 
+}
+
+message ReplicateRequest {
+  int64 amount = 1;
+  string bidder = 2;
+  int64 seq = 3;
+}
+
+message ReplicateResponse {
+  bool ok = 1;
+  string message = 2;
+}
+
+message HeartbeatRequest {
+  string leader_id = 1;
+  string sender_id = 2;
+}
+
+message HeartbeatResponse {
+  bool ok = 1;
+}
+
+message GetStateRequest {}
+
+message GetStateResponse {
+  int64 highest_bid = 1;
+  bool closed = 2;
+  int64 seq = 3;
+}
